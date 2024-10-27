@@ -1,479 +1,613 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chatbot Pintar dengan Preview Kode</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/github.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/github.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
     <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --background-color: #f5f7fa;
-            --text-color: #333333;
-            --border-radius: 12px;
-            --transition-speed: 0.3s;
-        }
+      :root {
+        --primary-color: #3498db;
+        --secondary-color: #2980b9;
+        --background-color: #f5f7fa;
+        --text-color: #333333;
+        --border-radius: 12px;
+        --transition-speed: 0.3s;
+      }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            background-color: var(--background-color);
-            transition: background-color var(--transition-speed);
-        }
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        background-color: var(--background-color);
+        transition: background-color var(--transition-speed);
+      }
 
+      .container {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .chat-column,
+      .preview-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        transition: all var(--transition-speed);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .chat-header,
+      .preview-header {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        padding: 20px;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      #chat-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background-color: #ffffff;
+        scroll-behavior: smooth;
+      }
+
+      .message-container {
+        display: flex;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .message {
+        max-width: 80%;
+        padding: 15px 20px;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        line-height: 1.5;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .user-message-container {
+        justify-content: flex-end;
+      }
+
+      .user-message {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .bot-message {
+        background-color: #f0f0f0;
+        color: var(--text-color);
+      }
+
+      .input-area {
+        padding: 20px;
+        background-color: #ffffff;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+      }
+
+      #user-input {
+        flex-grow: 1;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: var(--border-radius);
+        font-size: 16px;
+        transition: border-color var(--transition-speed);
+      }
+
+      #user-input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+      }
+
+      #send-button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: var(--border-radius);
+        margin-left: 10px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color var(--transition-speed);
+      }
+
+      #send-button:hover {
+        background-color: var(--secondary-color);
+      }
+
+      .suggested-messages {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px;
+        background-color: #ffffff;
+        border-top: 1px solid #e0e0e0;
+        justify-content: flex-start; /* Tambahkan baris ini */
+        transition: justify-content var(--transition-speed); /* Tambahkan baris ini */
+      }
+
+      .suggested-message {
+        background-color: #e0e0e0;
+        color: var(--text-color);
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        font-size: 14px;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+      }
+
+      .suggested-message:hover {
+        background-color: var(--primary-color);
+        color: #ffffff;
+        transform: translateY(-2px);
+      }
+
+      #code-content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        font-family: "Fira Code", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        background-color: #f8f8f8;
+      }
+
+      .preview-navbar {
+        display: flex;
+        background-color: #f0f0f0;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .preview-nav-item {
+        padding: 15px 25px;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+        font-weight: 500;
+      }
+
+      .preview-nav-item.active {
+        background-color: #ffffff;
+        border-bottom: 3px solid var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .preview-content {
+        flex: 1;
+        display: none;
+        padding: 20px;
+        overflow-y: auto;
+      }
+
+      .preview-content.active {
+        display: block;
+        animation: fadeIn 0.3s;
+      }
+
+      @media (max-width: 768px) {
         .container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
+          flex-direction: column;
         }
-
-        .chat-column, .preview-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            transition: all var(--transition-speed);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .chat-header, .preview-header {
-            background-color: var(--primary-color);
-            color: #ffffff;
-            padding: 20px;
-            font-size: 20px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        #chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background-color: #ffffff;
-            scroll-behavior: smooth;
-        }
-
-        .message-container {
-            display: flex;
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 15px 20px;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            line-height: 1.5;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-message-container {
-            justify-content: flex-end;
-        }
-
-        .user-message {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .bot-message {
-            background-color: #f0f0f0;
-            color: var(--text-color);
-        }
-
-        .input-area {
-            padding: 20px;
-            background-color: #ffffff;
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-        }
-
-        #user-input {
-            flex-grow: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: border-color var(--transition-speed);
-        }
-
-        #user-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        #send-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: var(--border-radius);
-            margin-left: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color var(--transition-speed);
-        }
-
-        #send-button:hover {
-            background-color: var(--secondary-color);
-        }
-
-        .suggested-messages {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            padding: 15px;
-            background-color: #ffffff;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        .suggested-message {
-            background-color: #e0e0e0;
-            color: var(--text-color);
-            padding: 10px 15px;
-            border-radius: var(--border-radius);
-            font-size: 14px;
-            cursor: pointer;
-            transition: all var(--transition-speed);
-        }
-
-        .suggested-message:hover {
-            background-color: var(--primary-color);
-            color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        #code-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            font-family: 'Fira Code', monospace;
-            font-size: 14px;
-            line-height: 1.6;
-            background-color: #f8f8f8;
-        }
-
-        .preview-navbar {
-            display: flex;
-            background-color: #f0f0f0;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .preview-nav-item {
-            padding: 15px 25px;
-            cursor: pointer;
-            transition: all var(--transition-speed);
-            font-weight: 500;
-        }
-
-        .preview-nav-item.active {
-            background-color: #ffffff;
-            border-bottom: 3px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .preview-content {
-            flex: 1;
-            display: none;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .preview-content.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            .chat-column, .preview-column {
-                width: 100%;
-                height: auto;
-                max-height: 50vh;
-            }
-            .preview-column {
-                border-top: 1px solid #e0e0e0;
-            }
-            .chat-header, .preview-header {
-                padding: 10px;
-                font-size: 16px;
-            }
-            .message {
-                max-width: 90%;
-                font-size: 14px;
-            }
-            .input-area {
-                padding: 10px;
-            }
-            #user-input {
-                padding: 8px 10px;
-                font-size: 14px;
-            }
-            #send-button {
-                padding: 8px 15px;
-                font-size: 14px;
-            }
-            .suggested-messages {
-                padding: 10px;
-            }
-            .suggested-message {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-            .preview-nav-item {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-            #code-content {
-                font-size: 12px;
-            }
-            .file-card {
-                width: calc(50% - 10px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .file-card {
-                width: 100%;
-            }
-        }
-
-        /* Animasi tambahan */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .message:hover {
-            animation: pulse 0.5s;
-        }
-
-        .file-item {
-            padding: 10px 15px;
-            margin-bottom: 5px;
-            background-color: #f0f0f0;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all var(--transition-speed);
-        }
-
-        .file-item:hover {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-
-        .file-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .file-card {
-            background-color: #f0f0f0;
-            border-radius: var(--border-radius);
-            padding: 10px;
-            cursor: pointer;
-            transition: all var(--transition-speed);
-            text-align: center;
-            width: calc(33.33% - 10px);
-        }
-
-        .file-card:hover {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-
-        .file-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .file-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .file-language {
-            font-size: 12px;
-            opacity: 0.7;
-        }
-
-        .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--primary-color);
-            color: #ffffff;
-            padding: 20px;
-            font-size: 20px;
-            font-weight: 600;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .logo {
-            height: 30px;
-            margin-right: 10px;
-        }
-
+        .chat-column,
         .preview-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            transition: all var(--transition-speed);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+          width: 100%;
+          height: auto;
+        }
+        .chat-column {
+          flex: 1;
+          min-height: 60vh;
+        }
+        .preview-column {
+          flex: 0 0 40vh;
+          border-top: 1px solid #e0e0e0;
+        }
+        .chat-header,
+        .preview-header {
+          padding: 10px;
+          font-size: 16px;
+        }
+        .message {
+          max-width: 90%;
+          font-size: 14px;
+        }
+        .input-area {
+          padding: 10px;
+        }
+        #user-input {
+          padding: 10px;
+          font-size: 16px;
+        }
+        #send-button {
+          padding: 10px 15px;
+          font-size: 16px;
+        }
+        .suggested-messages {
+          padding: 10px;
+          overflow-x: auto;
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+        }
+        .suggested-message {
+          display: inline-block;
+          padding: 8px 12px;
+          font-size: 14px;
+          margin-right: 10px;
+        }
+        .preview-nav-item {
+          padding: 10px 15px;
+          font-size: 14px;
+        }
+        #code-content {
+          font-size: 12px;
+        }
+        .file-card {
+          width: calc(50% - 10px);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .chat-column {
+          min-height: 70vh;
+        }
+        .preview-column {
+          flex: 0 0 30vh;
+        }
+        .file-card {
+          width: 100%;
+        }
+        #user-input {
+          font-size: 14px;
+        }
+        #send-button {
+          padding: 10px;
+          font-size: 14px;
+        }
+      }
+
+      /* Animasi tambahan */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .message:hover {
+        animation: pulse 0.5s;
+      }
+
+      .file-item {
+        padding: 10px 15px;
+        margin-bottom: 5px;
+        background-color: #f0f0f0;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: all var(--transition-speed);
+      }
+
+      .file-item:hover {
+        background-color: var(--primary-color);
+        color: #ffffff;
+      }
+
+      .file-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .file-card {
+        background-color: #f0f0f0;
+        border-radius: var(--border-radius);
+        padding: 10px;
+        cursor: pointer;
+        transition: all var(--transition-speed);
+        text-align: center;
+        width: calc(33.33% - 10px);
+      }
+
+      .file-card:hover {
+        background-color: var(--primary-color);
+        color: #ffffff;
+      }
+
+      .file-icon {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .file-name {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .file-language {
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        padding: 20px;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .logo {
+        height: 30px;
+        margin-right: 10px;
+      }
+
+      .preview-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        transition: all var(--transition-speed);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .preview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: var(--primary-color);
+        color: #ffffff;
+        padding: 15px 20px;
+        font-size: 18px;
+        font-weight: 600;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .toggle-preview {
+        background: none;
+        border: none;
+        color: #ffffff;
+        font-size: 20px;
+        cursor: pointer;
+        transition: transform var(--transition-speed);
+      }
+
+      .toggle-preview:hover {
+        transform: scale(1.1);
+      }
+
+      .preview-column.hidden {
+        flex: 0;
+        width: 0;
+        overflow: hidden;
+      }
+
+      .show-preview-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        transition: all var(--transition-speed);
+        z-index: 1000;
+      }
+
+      .show-preview-btn:hover {
+        transform: scale(1.1);
+      }
+
+      @media (max-width: 768px) {
+        .preview-column.hidden {
+          height: 0;
         }
 
         .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: var(--primary-color);
-            color: #ffffff;
-            padding: 15px 20px;
-            font-size: 18px;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          padding: 10px 15px;
+          font-size: 16px;
         }
 
         .toggle-preview {
-            background: none;
-            border: none;
-            color: #ffffff;
-            font-size: 20px;
-            cursor: pointer;
-            transition: transform var(--transition-speed);
-        }
-
-        .toggle-preview:hover {
-            transform: scale(1.1);
-        }
-
-        .preview-column.hidden {
-            flex: 0;
-            width: 0;
-            overflow: hidden;
+          font-size: 18px;
         }
 
         .show-preview-btn {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            transition: all var(--transition-speed);
-            z-index: 1000;
+          width: 40px;
+          height: 40px;
+          font-size: 16px;
+          top: 10px;
+          right: 10px;
         }
+      }
 
-        .show-preview-btn:hover {
-            transform: scale(1.1);
+      /* Tambahkan gaya baru untuk tombol toggle pratinjau */
+      .toggle-preview-mobile {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: none;
+        z-index: 1000;
+      }
+
+      @media (max-width: 768px) {
+        .toggle-preview-mobile {
+          display: block;
         }
+      }
 
-        @media (max-width: 768px) {
-            .preview-column.hidden {
-                height: 0;
-            }
-
-            .preview-header {
-                padding: 10px 15px;
-                font-size: 16px;
-            }
-
-            .toggle-preview {
-                font-size: 18px;
-            }
-
-            .show-preview-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-                top: 10px;
-                right: 10px;
-            }
-        }
+      /* Tambahkan gaya baru ini */
+      .preview-column.hidden + .chat-column .suggested-messages {
+        justify-content: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="chat-column">
-            <div class="chat-header">
-                <img src="white_on_trans.png" alt="Logo" class="logo">
-                <i class="fas fa-robot"></i> Chatbot Pintar
-            </div>
-            <div id="chat-container"></div>
-            <div class="suggested-messages">
-                <div class="suggested-message"><i class="fas fa-calculator"></i> Buat kalkulator harga SaaS</div>
-                <div class="suggested-message"><i class="fas fa-code"></i> Cara menyusun output LLM</div>
-                <div class="suggested-message"><i class="fas fa-layer-group"></i> Fungsi untuk meratakan array bersarang</div>
-            </div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Apa yang dapat saya bantu untuk Anda buat?">
-                <button id="send-button"><i class="fas fa-paper-plane"></i></button>
-            </div>
+      <div class="chat-column">
+        <div class="chat-header">
+          <img src="white_on_trans.png" alt="Logo" class="logo" />
+          <i class="fas fa-robot"></i> Chatbot Pintar
         </div>
-        <div class="preview-column">
-            <div class="preview-header">
-                <span><i class="fas fa-eye"></i> Pratinjau</span>
-                <button class="toggle-preview" id="toggle-preview"><i class="fas fa-chevron-right"></i></button>
-            </div>
-            <div class="preview-navbar">
-                <div class="preview-nav-item active" data-target="code-content"><i class="fas fa-code"></i> Kode</div>
-                <div class="preview-nav-item" data-target="result-preview"><i class="fas fa-play"></i> Hasil</div>
-            </div>
-            <div id="code-content" class="preview-content active">
-                <pre><code></code></pre>
-            </div>
-            <div id="result-preview" class="preview-content">
-                <!-- Hasil pratinjau akan ditampilkan di sini -->
-            </div>
+        <div id="chat-container"></div>
+        <div class="suggested-messages">
+          <div class="suggested-message">
+            <i class="fas fa-calculator"></i> Buat kalkulator harga SaaS
+          </div>
+          <div class="suggested-message">
+            <i class="fas fa-code"></i> Cara menyusun output LLM
+          </div>
+          <div class="suggested-message">
+            <i class="fas fa-layer-group"></i> Fungsi untuk meratakan array
+            bersarang
+          </div>
         </div>
+        <div class="input-area">
+          <input
+            type="text"
+            id="user-input"
+            placeholder="Apa yang dapat saya bantu untuk Anda buat?"
+          />
+          <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+      </div>
+      <div class="preview-column">
+        <div class="preview-header">
+          <span><i class="fas fa-eye"></i> Pratinjau</span>
+          <button class="toggle-preview" id="toggle-preview">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="preview-navbar">
+          <div class="preview-nav-item active" data-target="code-content">
+            <i class="fas fa-code"></i> Kode
+          </div>
+          <div class="preview-nav-item" data-target="result-preview">
+            <i class="fas fa-play"></i> Hasil
+          </div>
+        </div>
+        <div id="code-content" class="preview-content active">
+          <pre><code></code></pre>
+        </div>
+        <div id="result-preview" class="preview-content">
+          <!-- Hasil pratinjau akan ditampilkan di sini -->
+        </div>
+      </div>
     </div>
-    <button class="show-preview-btn" id="show-preview-btn" title="Tampilkan Pratinjau"><i class="fas fa-code"></i></button>
+    <button
+      class="show-preview-btn"
+      id="show-preview-btn"
+      title="Tampilkan Pratinjau"
+    >
+      <i class="fas fa-code"></i>
+    </button>
+    <button class="toggle-preview-mobile" id="toggle-preview-mobile">
+      <i class="fas fa-code"></i>
+    </button>
     <script src="client.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const togglePreviewBtn = document.getElementById('toggle-preview');
-            const showPreviewBtn = document.getElementById('show-preview-btn');
-            const previewColumn = document.querySelector('.preview-column');
-            const toggleIcon = togglePreviewBtn.querySelector('i');
+      document.addEventListener("DOMContentLoaded", function () {
+        const togglePreviewBtn = document.getElementById("toggle-preview");
+        const togglePreviewMobileBtn = document.getElementById(
+          "toggle-preview-mobile"
+        );
+        const showPreviewBtn = document.getElementById("show-preview-btn");
+        const previewColumn = document.querySelector(".preview-column");
+        const toggleIcon = togglePreviewBtn.querySelector("i");
+        const chatColumn = document.querySelector(".chat-column");
 
-            function togglePreview() {
-                previewColumn.classList.toggle('hidden');
-                toggleIcon.classList.toggle('fa-chevron-right');
-                toggleIcon.classList.toggle('fa-chevron-left');
-                showPreviewBtn.style.display = previewColumn.classList.contains('hidden') ? 'block' : 'none';
-            }
+        function togglePreview() {
+          previewColumn.classList.toggle("hidden");
+          toggleIcon.classList.toggle("fa-chevron-right");
+          toggleIcon.classList.toggle("fa-chevron-left");
+          showPreviewBtn.style.display = previewColumn.classList.contains(
+            "hidden"
+          )
+            ? "block"
+            : "none";
 
-            togglePreviewBtn.addEventListener('click', togglePreview);
-            showPreviewBtn.addEventListener('click', togglePreview);
+          if (window.innerWidth <= 768) {
+            chatColumn.style.display = previewColumn.classList.contains(
+              "hidden"
+            )
+              ? "flex"
+              : "none";
+          }
+
+          // Tambahkan baris ini untuk memperbarui posisi suggested-messages
+          document.querySelector(".suggested-messages").style.justifyContent =
+            previewColumn.classList.contains("hidden")
+              ? "center"
+              : "flex-start";
+        }
+
+        togglePreviewBtn.addEventListener("click", togglePreview);
+        showPreviewBtn.addEventListener("click", togglePreview);
+        togglePreviewMobileBtn.addEventListener("click", togglePreview);
+
+        window.addEventListener("resize", function () {
+          if (window.innerWidth > 768) {
+            chatColumn.style.display = "flex";
+            previewColumn.classList.remove("hidden");
+          }
         });
+      });
     </script>
-</body>
+  </body>
 </html>
