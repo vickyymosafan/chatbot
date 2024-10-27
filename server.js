@@ -2,6 +2,7 @@ const express = require("express");
 const Groq = require("groq-sdk");
 require("dotenv").config();
 const cors = require("cors");
+const path = require("path");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,9 +11,22 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-app.use(express.static("public"));
+// Ubah ini untuk menentukan folder statis dengan benar
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
-app.use(cors());
+
+// Ganti ini dengan konfigurasi CORS yang lebih spesifik
+app.use(cors({
+  origin: 'https://ai-neon-zeta.vercel.app', // Sesuaikan dengan URL deployment Anda
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Tambahkan logging untuk memeriksa permintaan yang masuk
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
 
 // Tambahkan rute GET untuk halaman utama
 app.get("/", (req, res) => {
@@ -20,6 +34,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/chat", async (req, res) => {
+  console.log("Menerima permintaan chat:", JSON.stringify(req.body, null, 2));
   const {message, htmlCheatSheet, cssCheatSheet, jsCheatSheet} = req.body;
 
   // Gabungkan cheat sheet ke dalam satu string
@@ -71,6 +86,12 @@ ${jsCheatSheet}
       .status(500)
       .json({error: "Terjadi kesalahan saat memproses permintaan"});
   }
+});
+
+// Tambahkan ini di akhir file, sebelum app.listen
+app.use((req, res) => {
+  console.log(`404: ${req.method} ${req.url}`);
+  res.status(404).send("Halaman tidak ditemukan");
 });
 
 app.listen(port, () => {
