@@ -557,16 +557,10 @@
     >
       <i class="fas fa-code"></i>
     </button>
-    <button class="toggle-preview-mobile" id="toggle-preview-mobile">
-      <i class="fas fa-code"></i>
-    </button>
     <script src="client.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const togglePreviewBtn = document.getElementById("toggle-preview");
-        const togglePreviewMobileBtn = document.getElementById(
-          "toggle-preview-mobile"
-        );
         const showPreviewBtn = document.getElementById("show-preview-btn");
         const previewColumn = document.querySelector(".preview-column");
         const toggleIcon = togglePreviewBtn.querySelector("i");
@@ -590,7 +584,6 @@
               : "none";
           }
 
-          // Tambahkan baris ini untuk memperbarui posisi suggested-messages
           document.querySelector(".suggested-messages").style.justifyContent =
             previewColumn.classList.contains("hidden")
               ? "center"
@@ -599,12 +592,12 @@
 
         togglePreviewBtn.addEventListener("click", togglePreview);
         showPreviewBtn.addEventListener("click", togglePreview);
-        togglePreviewMobileBtn.addEventListener("click", togglePreview);
 
         window.addEventListener("resize", function () {
           if (window.innerWidth > 768) {
             chatColumn.style.display = "flex";
             previewColumn.classList.remove("hidden");
+            showPreviewBtn.style.display = "none";
           }
         });
       });
