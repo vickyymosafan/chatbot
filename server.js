@@ -16,11 +16,13 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
 // Ganti ini dengan konfigurasi CORS yang lebih spesifik
-app.use(cors({
-  origin: 'https://ai-neon-zeta.vercel.app', // Sesuaikan dengan URL deployment Anda
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: "ai-vickymosafan.vercel.app", // Sesuaikan dengan URL deployment Anda
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // Tambahkan logging untuk memeriksa permintaan yang masuk
 app.use((req, res, next) => {
